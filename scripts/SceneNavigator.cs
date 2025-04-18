@@ -8,15 +8,16 @@ using UnityEngine.SceneManagement;
 internal class SceneNavigator : EditorWindow
 {
     private const int MaxHistory = 10;
-    
-    private static Stack<string> _sceneHistory = new();
-    private static List<string> _tempList;
-    private static string _currentScene;
+    private const string CurrentScenePointer = " \u25c0";
+
+    private readonly LinkedList<string> _sceneHistory = new();
+    private static string _lastScene;
+    private string _sceneName;
 
     private void OnEnable()
     {
         EditorSceneManager.sceneOpened += OnSceneOpened;
-        _currentScene = SceneManager.GetActiveScene().path;
+        _lastScene = SceneManager.GetActiveScene().path;
     }
 
     private void OnDisable()
@@ -28,17 +29,14 @@ internal class SceneNavigator : EditorWindow
 
     private void OnSceneOpened(Scene scene, OpenSceneMode mode)
     {
-        if (!string.IsNullOrEmpty(_currentScene) && _currentScene != scene.path)
+        if (!_sceneHistory.Contains(scene.path))
         {
-            _sceneHistory.Push(_currentScene);
-            if (_sceneHistory.Count > MaxHistory)
-            {
-                _tempList = new List<string>(_sceneHistory);
-                _tempList.RemoveAt(0);
-                _sceneHistory = new Stack<string>(_tempList);
-            }
+            _sceneHistory.AddFirst(scene.path);
+            if (_sceneHistory.Count > MaxHistory) 
+                _sceneHistory.RemoveLast();
         }
-        _currentScene = scene.path;
+        
+        _lastScene = scene.path;
     }
 
     private void OnGUI()
@@ -46,21 +44,28 @@ internal class SceneNavigator : EditorWindow
         GUILayout.Label("Scenes in Build Settings:", EditorStyles.boldLabel);
 
         foreach (var scene in EditorBuildSettings.scenes)
-            if (GUILayout.Button($"Open {scene.path}")) 
+        {
+            _sceneName = scene.path;
+            if (SceneManager.GetActiveScene().path == scene.path)
+                _sceneName = $"{scene.path}{CurrentScenePointer}";
+            if (GUILayout.Button($"Open {_sceneName}"))
                 OpenScene(scene.path);
+        }
 
         GUILayout.Space(10);
         GUILayout.Label("Recent Scenes:", EditorStyles.boldLabel);
 
         foreach (var scenePath in _sceneHistory)
-            if (GUILayout.Button($"Open {scenePath}")) 
+            if (GUILayout.Button($"Open {scenePath}"))
                 OpenScene(scenePath);
     }
 
     private void OpenScene(string scenePath)
     {
-        if (scenePath != _currentScene) 
+        if (scenePath != _lastScene)
+        {
             EditorSceneManager.OpenScene(scenePath);
+        }
     }
 }
 
