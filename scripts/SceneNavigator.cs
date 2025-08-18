@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using _Developer.Scripts.Utilities;
-using Services.DataStorageService;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.ShortcutManagement;
@@ -118,4 +116,5 @@ internal abstract class SceneNavigatorShortcut
 
     [Shortcut(ShortcutId, KeyCode.O, ShortcutModifiers.Control | ShortcutModifiers.Shift)]
     static void SpecialActionShortcut() => SceneNavigator.ShowWindow();
+
 }
