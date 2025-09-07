@@ -5,7 +5,7 @@ public class TimeScaleWindow : EditorWindow
 {
     private static TimeScaleWindow _window;
     private float _timeScale = 1f;
-    private float _miтScale = 0f;
+    private float _minScale = 0f;
     private float _maxScale = 1f;
 
     [MenuItem("Tools/TimeScale Window 🕓")]
@@ -14,8 +14,8 @@ public class TimeScaleWindow : EditorWindow
         if (_window == null)
         {
             _window = GetWindow<TimeScaleWindow>("Time Scale");
-            _window.minSize = new Vector2(250f, 125f);
-            _window.maxSize = new Vector2(500f, 125f);
+            _window.minSize = new Vector2(250f, 150f);
+            _window.maxSize = new Vector2(500f, 150f);
         }
         _window.Show();
     }
@@ -24,13 +24,21 @@ public class TimeScaleWindow : EditorWindow
     {
         EditorGUILayout.LabelField("Adjust Time Scale", EditorStyles.boldLabel);
 
-        _miтScale = EditorGUILayout.FloatField("Min Scale", _miтScale);
+        _minScale = EditorGUILayout.FloatField("Min Scale", _minScale);
         _maxScale = EditorGUILayout.FloatField("Max Scale", _maxScale);
 
-        if (_miтScale > _maxScale) 
-            _miтScale = _maxScale;
+        if (_minScale > _maxScale)
+            _minScale = _maxScale;
 
-        _timeScale = EditorGUILayout.Slider("Time Scale", _timeScale, _miтScale, _maxScale);
+        _timeScale = EditorGUILayout.Slider("Time Scale", _timeScale, _minScale, _maxScale);
         Time.timeScale = _timeScale;
+
+        EditorGUILayout.Space();
+
+        if (GUILayout.Button("Reset"))
+        {
+            _timeScale = 1f;
+            Time.timeScale = 1f;
+        }
     }
 }
